@@ -2,3 +2,4 @@ shelly:
     url:     "http://yourplugaddress/status"
     user:     username
     password: password
+    scrapetimeinseconds: 60

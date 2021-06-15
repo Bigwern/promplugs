@@ -44,9 +44,10 @@ var (
 
 	Config = struct {
 		Shelly struct {
-			Url      string `required:"true" env:"SHELLYURL"`
-			User     string `default:"admin"`
-			Password string `required:"false" env:"SHELLYPW"`
+			Url                 string `required:"true" env:"SHELLYURL"`
+			User                string `default:"admin"`
+			Password            string `required:"false" env:"SHELLYPW"`
+			ScrapetimeInSeconds int    `required:"false" env:"SCRAPETIME"`
 		}
 	}{}
 
@@ -117,7 +118,7 @@ type PlugS2point5 struct {
 	Uptime   int `json:"uptime"`
 }
 
-const waitseconds int = 5
+const waitseconds int = 30
 
 func init() {
 
@@ -176,7 +177,11 @@ func callShelly() {
 }
 
 func main() {
-	logrus.Infof("Startup PromPlugS")
+	scrapetime := waitseconds
+	if Config.Shelly.ScrapetimeInSeconds != 0 {
+		scrapetime = Config.Shelly.ScrapetimeInSeconds
+	}
+	logrus.Infof("Startup PromPlugS with interval of %v seconds", scrapetime)
 
 	/*
 		s := gocron.NewScheduler(time.UTC)
@@ -187,7 +192,7 @@ func main() {
 	go http.ListenAndServe(":9091", nil)
 
 	for {
-		time.Sleep(time.Duration(waitseconds) * time.Second)
+		time.Sleep(time.Duration(scrapetime) * time.Second)
 		callShelly()
 	}
 
